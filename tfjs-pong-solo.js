@@ -1,27 +1,6 @@
 const init = async () => {
-  // model = await tf.loadModel(
-  //   'https://hkinsley.com/static/tfjsmodel/model.json'
-  // );
-  // console.log('model loaded from storage');
-  // computer.ai_plays = false;
-
-  // start a game
   animate(step);
 };
-
-/**
- * A.I. code
- * =========
- * Initial model definition
- */
-// let model = tf.sequential();
-// model.add(tf.layers.dense({ units: 256, inputShape: [8] })); // input is 1x8
-// model.add(tf.layers.dense({ units: 512, inputShape: [256] })); // hidden layer
-// model.add(tf.layers.dense({ units: 256, inputShape: [512] })); // hidden layer
-// model.add(tf.layers.dense({ units: 3, inputShape: [256] })); // output is 1x3
-// const learningRate = 0.0001;
-// const optimizer = tf.train.adam(learningRate);
-// model.compile({ loss: 'meanSquaredError', optimizer });
 
 /**
  * Pong code
@@ -50,7 +29,6 @@ const context = canvas.getContext('2d');
 const player = new Player();
 const computer = new Computer();
 const ball = new Ball((board_width / 2), (board_height / 2));
-// const ai = new AI();
 const keysDown = {};
 
 const render = () => {
@@ -62,18 +40,9 @@ const render = () => {
 };
 
 const update = () => {
-  // player.update();
   player.update(ball);
-
-  // if (computer.ai_plays) {
-  //   move = ai.predict_move();
-  //   computer.ai_update(move);
-  // } else {
-    computer.update(ball);
-  // }
-
+  computer.update(ball);
   ball.update(player.paddle, computer.paddle);
-  // ai.save_data(player.paddle, computer.paddle, ball);
 };
 
 const step = () => {
@@ -130,7 +99,6 @@ function Computer() {
     0,
     '#ff0000'
   );
-  // this.ai_plays = false;
 }
 
 Computer.prototype.render = function() {
@@ -156,16 +124,6 @@ Computer.prototype.update = function(ball) {
     this.paddle.x = board_width - this.paddle.width;
   }
 };
-
-/**
- * A.I. code
- * =========
- * Depending on the move passed in, we move the computer 5x.
- * Network output is either -1, 0, 1 (left, stay, right)
- */
-// Computer.prototype.ai_update = function (move = 0) {
-//   // this.paddle.move(5 * move, 0)
-// }
 
 /**
  * Pong code
@@ -207,12 +165,9 @@ Player.prototype.update = function() {
 function Ball(x, y) {
   this.x = x;
   this.y = y;
-  // this.x_speed = Math.random() * 4 + 1;
-  // this.y_speed = Math.random() * 3 + 2;
   this.x_speed = 0;
   this.y_speed = 5;
   this.player_strikes = false;
-  // this.ai_strikes = false;
 }
 
 Ball.prototype.render = function() {
@@ -239,17 +194,13 @@ Ball.prototype.update = function(paddle1, paddle2, new_turn) {
   }
 
   if (this.y < 0 || this.y > board_height) {
-    // this.x_speed = Math.random() * 4 + 1;
     this.x_speed = 0;
-    // this.y_speed = Math.random() * 3 + 2;
     this.y_speed = 5;
     this.x = (board_width / 2);
     this.y = (board_height / 2);
-    // ai.new_turn();
   }
 
   this.player_strikes = false;
-  // this.ai_strikes = false;
 
   if (top_y > (board_height / 2)) {
     if (
@@ -274,162 +225,9 @@ Ball.prototype.update = function(paddle1, paddle2, new_turn) {
       this.y_speed = 5;
       this.x_speed += paddle2.x_speed / 2;
       this.y += this.y_speed;
-      // this.ai_strikes = true;
-      // console.log('A.I. strikes!');
     }
   }
 };
-
-/**
- * A.I. code
- * =========
- * Store data for ai
- */
-// function AI() {
-//   this.previous_data = null;
-//   this.training_data = [[], [], []];
-//   this.last_data_object = null;
-//   this.turn = 0;
-//   this.grab_data = true;
-//   this.flip_table = true;
-// }
-
-/**
- * A.I. code
- * =========
- * Save data per frame
- */
-// AI.prototype.save_data = function(player, computer, ball) {
-//   if (!this.grab_data) return;
-
-//   // If this is the very first frame (no prior data)
-//   if (this.previous_data === null) {
-//     data = this.flip_table
-//       ? [
-//           board_width - computer.x,
-//           board_width - player.x,
-//           board_width - ball.x,
-//           board_height - ball.y
-//         ]
-//       : [player.x, computer.x, ball.x, ball.y];
-//     this.previous_data = data;
-//     return;
-//   }
-
-//   // table is rotated to learn from player, but apply to computer position
-//   if (this.flip_table) {
-//     data_xs = [
-//       board_width - computer.x,
-//       board_width - player.x,
-//       board_width - ball.x,
-//       board_height - ball.y
-//     ];
-//     index =
-//       board_width - player.x > this.previous_data[1]
-//         ? 0 : board_width - player.x == this.previous_data[1] ? 1 : 2;
-//   } else {
-//     data_xs = [player.x, computer.x, ball.x, ball.y];
-//     index =
-//       player.x < this.previous_data[0]
-//         ? 0 : player.x == this.previous_data[0] ? 1 : 2;
-//   }
-
-//   this.last_data_object = [...this.previous_data, ...data_xs];
-//   this.training_data[index].push(this.last_data_object);
-//   this.previous_data = data_xs;
-// };
-
-/**
- * A.I. code
- * =========
- * Decide whether to play as ai
- */
-// AI.prototype.new_turn = function() {
-//   this.previous_data = null;
-//   this.turn++;
-//   console.log(`new turn: ${this.turn}`);
-
-//   // number of games to train?
-//   if (this.turn > 1) {
-//     this.train();
-//     computer.ai_plays = true;
-//     this.reset();
-//   }
-// }
-
-/**
- * A.I. code
- * =========
- * Empty training data to start clean
- */
-// AI.prototype.reset = function() {
-//   this.previous_data = null;
-//   this.training_data = [[], [], []];
-//   this.turn = 0;
-
-//   console.log('reset... ');
-// }
-
-/**
- * A.I. code
- * =========
- * Train a model
- */
-// AI.prototype.train = function() {
-//   console.log('balancing');
-
-//   // shuffle attempt
-//   len = Math.min(
-//     this.training_data[0].length,
-//     this.training_data[1].length,
-//     this.training_data[2].length
-//   );
-
-//   console.log('training_data', this.training_data);
-
-//   if (!len) {
-//     console.log('nothing to train');
-//     return;
-//   }
-
-//   data_xs = [];
-//   data_ys = [];
-
-//   for (let i = 0; i < 3; i++) {
-//     data_xs.push(...this.training_data[i].slice(0, len));
-//     data_ys.push(
-//       ...Array(len).fill([i == 0 ? 1 : 0, i == 1 ? 1 : 0, i == 2 ? 1 : 0])
-//     );
-//   }
-
-//   document.createElement('playing').innerHTML =
-//     'Training: ' + data_xs.length + ' records';
-
-//   const xs = tf.tensor(data_xs);
-//   const ys = tf.tensor(data_ys);
-
-//   (async function() {
-//     console.log('training...');
-//     let result = await model.fit(xs, ys);
-//     console.log('result', result);
-//   })();
-
-//   console.log('trained!');
-// };
-
-/**
- * A.I. code
- * =========
- * Make predictions based on training data
- */
-// AI.prototype.predict_move = function() {
-//   if (this.last_data_object !== null) {
-//     // use this.last_data_object for input data
-//     // return -1, 0, 1
-//     prediction = model.predict(tf.tensor([this.last_data_object]));
-//     return -(tf.argMax(prediction, 1).dataSync() - 1);
-//   }
-// };
 
 /**
  * Pong code

@@ -1,6 +1,5 @@
 const init = async () => {
   model = await tf.loadModel(
-    // 'https://hkinsley.com/static/tfjsmodel/model.json'
     'tfjsmodel/model.json'
   );
   console.log('model loaded from storage');

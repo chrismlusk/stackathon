@@ -1,8 +1,4 @@
 const init = async () => {
-  // model = await tf.loadModel(
-  //   'https://hkinsley.com/static/tfjsmodel/model.json'
-  // );
-  // console.log('model loaded from storage');
   computer.ai_plays = false;
 
   document.getElementById('playing').innerHTML = computer.ai_plays
@@ -66,7 +62,6 @@ const render = () => {
 };
 
 const update = () => {
-  // player.update();
   player.update(ball);
 
   if (computer.ai_plays) {
